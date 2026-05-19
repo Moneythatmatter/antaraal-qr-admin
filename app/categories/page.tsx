@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
 import { cn } from "@/lib/utils";
 
-const API_BASE_URL = "http://88.222.215.206:4000//api";
+const API_BASE_URL = "https://api.antaraalresort.com/api";
 
 export default function CategoriesPage() {
   const { categories, menuItems, refreshData, loading } = useAdmin();
