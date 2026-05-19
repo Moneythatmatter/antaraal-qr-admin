@@ -21,7 +21,7 @@ import { useAdmin } from "@/context/AdminContext";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
-const API_BASE_URL = "https://qr-menue-backend.onrender.com/api";
+const API_BASE_URL = "http://88.222.215.206:4000/api";
 
 export default function MenuItemDetail() {
   const params = useParams();

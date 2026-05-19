@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
-const API_BASE_URL = "https://qr-menue-backend.onrender.com/api";
+const API_BASE_URL = "http://88.222.215.206:4000/api";
 
 interface AdminContextType {
   categories: any[];
