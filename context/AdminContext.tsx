@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-
-const API_BASE_URL = "https://api.antaraalresort.com/api";
+import { API_BASE_URL } from "@/lib/api";
+import { setupAxiosAuthInterceptor } from "@/lib/axios-auth";
 
 interface AdminContextType {
   categories: any[];
@@ -36,6 +36,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    setupAxiosAuthInterceptor();
     fetchData();
   }, []);
 

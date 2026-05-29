@@ -1,8 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import axios from "axios";
 import {
   LayoutDashboard,
   Layers,
@@ -15,6 +16,21 @@ import { motion } from "framer-motion";
 
 export const Sidebar = () => {
   const pathname = usePathname() || "";
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await axios.post("/api/auth/logout");
+      router.replace("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   const getActiveTab = () => {
     if (pathname === "/" || pathname === "/dashboard") return "dashboard";
@@ -68,9 +84,14 @@ export const Sidebar = () => {
       </nav>
 
       <div className="p-8 border-t border-zinc-50">
-        <button className="flex items-center gap-4 w-full px-6 py-4 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 font-bold text-sm">
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="flex items-center gap-4 w-full px-6 py-4 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 font-bold text-sm disabled:opacity-50"
+        >
           <LogOut size={22} />
-          <span>Sign Out</span>
+          <span>{loggingOut ? "Signing out..." : "Sign Out"}</span>
         </button>
       </div>
     </aside>
@@ -92,7 +113,7 @@ const SidebarLink = ({ icon, label, active, href }: SidebarLinkProps) => {
         "flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-500 group relative overflow-hidden",
         active
           ? "bg-[#17281e] text-white shadow-2xl shadow-primary/20 translate-x-1"
-          : "text-zinc-400 hover:bg-[#17281e] hover:text-[#17281e]"
+          : "text-zinc-400 hover:bg-gray-300 hover:text-[#050b14]"
       )}
     >
       <span className={cn(

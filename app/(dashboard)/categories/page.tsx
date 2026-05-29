@@ -2,18 +2,18 @@
 
 import React, { useState } from "react";
 import axios from "axios";
-import { Plus, Edit, Trash2, Save, X, LayoutGrid } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, LayoutGrid, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
 import { cn } from "@/lib/utils";
-
-const API_BASE_URL = "https://api.antaraalresort.com/api";
+import { API_BASE_URL } from "@/lib/api";
 
 export default function CategoriesPage() {
   const { categories, menuItems, refreshData, loading } = useAdmin();
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [categoryName, setCategoryName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,13 +42,26 @@ export default function CategoriesPage() {
     }
   };
 
+  const filteredCategories = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-
+      <div className="flex flex-row items-center gap-2 md:gap-4 w-full">
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search categories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-3 md:py-3.5 bg-white border border-zinc-100 rounded-[1rem] md:rounded-2xl text-sm focus:ring-4 focus:ring-primary/10 outline-none shadow-sm text-zinc-900 font-medium transition-all"
+          />
+        </div>
         <button
           onClick={() => { setCategoryName(""); setEditingCategory(null); setShowModal(true); }}
-          className="hidden md:flex bg-primary text-white px-6 py-3 rounded-2xl font-bold items-center gap-2 hover:bg-zinc-900 transition-all shadow-lg shadow-primary/20"
+          className="hidden md:flex shrink-0 bg-primary text-white px-6 py-3 rounded-2xl font-bold items-center gap-2 hover:bg-zinc-900 transition-all shadow-lg shadow-primary/20"
         >
           <Plus size={20} /> Add Category
         </button>
@@ -56,7 +69,7 @@ export default function CategoriesPage() {
 
       <div className={cn(
         "grid gap-6",
-        categories.length === 0 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        filteredCategories.length === 0 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
       )}>
         {loading ? (
           <div className="col-span-full p-20 text-center text-gray-400">Loading categories...</div>
@@ -67,8 +80,13 @@ export default function CategoriesPage() {
             </div>
             <p className="text-gray-400 font-medium">No categories found. Start by adding one!</p>
           </div>
+        ) : filteredCategories.length === 0 ? (
+          <div className="col-span-full p-20 text-center bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <Search size={40} className="text-gray-200 mx-auto mb-4" />
+            <p className="text-gray-400 font-medium">No categories match your search.</p>
+          </div>
         ) : (
-          categories.map((cat) => {
+          filteredCategories.map((cat) => {
             // Count items in this category
             const itemCount = menuItems.filter(item =>
               item.category?._id === cat._id || item.category === cat._id
@@ -83,26 +101,31 @@ export default function CategoriesPage() {
                 {/* Background Accent */}
                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
 
-                <div className="flex flex-row md:flex-col h-full items-center md:items-start gap-4 md:gap-0">
-                  <div className="flex justify-between items-start md:mb-6 w-auto md:w-full">
-                    <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-primary to-primary/80 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-serif font-semibold text-xl md:text-2xl shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform duration-500 flex-shrink-0">
+                <div className="flex flex-row md:flex-col h-full items-center md:items-start gap-3 md:gap-0">
+                  <div className="flex justify-between items-start md:mb-4 w-auto md:w-full">
+                    <div className="w-11 h-11 md:w-12 md:h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center text-white font-sans font-semibold text-base md:text-lg shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-500 flex-shrink-0">
                       {cat.name.charAt(0)}
                     </div>
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-serif font-semibold text-lg md:text-xl text-zinc-900 mb-0.5 md:mb-1 group-hover:text-primary transition-colors truncate">{cat.name}</h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[9px] md:text-[10px] text-zinc-400 uppercase font-black tracking-widest">Category</span>
-                      <div className="h-1 w-1 rounded-full bg-zinc-200" />
-                      <span className="text-[9px] md:text-[10px] text-primary font-black bg-primary/5 px-2 py-0.5 rounded-md lining-nums">
+                  <div className="flex-1 min-w-0 md:pr-12">
+                    <h3
+                      className="font-sans font-medium text-sm md:text-[16px] text-zinc-800 mb-1 group-hover:text-primary transition-colors line-clamp-2 leading-snug normal-case"
+                      title={cat.name}
+                    >
+                      {cat.name}
+                    </h3>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-[11px] text-zinc-400 uppercase font-semibold tracking-wide shrink-0">Category</span>
+                      <div className="h-1 w-1 rounded-full bg-zinc-200 shrink-0" />
+                      <span className="text-[11px] text-primary font-semibold bg-primary/5 px-2 py-0.5 rounded-md lining-nums truncate">
                         {itemCount} {itemCount === 1 ? "Item" : "Items"}
                       </span>
                     </div>
                   </div>
 
                   {/* Actions - Bottom right on mobile, Top right on desktop */}
-                  <div className="flex items-center gap-1 md:absolute md:top-6 md:right-6">
+                  <div className="flex items-center gap-1 shrink-0 md:absolute md:top-5 md:right-5">
                     <button
                       onClick={() => {
                         setCategoryName(cat.name);

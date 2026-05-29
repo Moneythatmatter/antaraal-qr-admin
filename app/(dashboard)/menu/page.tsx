@@ -19,8 +19,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useAdmin } from "@/context/AdminContext";
 import { cn } from "@/lib/utils";
-
-const API_BASE_URL = "https://api.antaraalresort.com/api";
+import { API_BASE_URL } from "@/lib/api";
+import { DietTypeSelect } from "@/components/DietTypeSelect";
 
 export default function MenuPage() {
   const { menuItems, categories, refreshData, loading } = useAdmin();
@@ -37,6 +37,7 @@ export default function MenuPage() {
   const [itemCategory, setItemCategory] = useState("");
   const [itemDescription, setItemDescription] = useState("");
   const [itemImage, setItemImage] = useState("");
+  const [itemDietType, setItemDietType] = useState<"veg" | "non-veg">("veg");
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +46,8 @@ export default function MenuPage() {
       price: Number(itemPrice),
       category: itemCategory,
       description: itemDescription,
-      image: itemImage
+      image: itemImage,
+      dietType: itemDietType,
     };
 
     try {
@@ -68,6 +70,7 @@ export default function MenuPage() {
     setItemCategory("");
     setItemDescription("");
     setItemImage("");
+    setItemDietType("veg");
     setEditingItem(null);
   };
 
@@ -270,8 +273,8 @@ export default function MenuPage() {
               exit={{ scale: 0.95, opacity: 0, y: 40 }}
               className="bg-white w-full max-w-4xl rounded-t-[2.5rem] sm:rounded-[3rem] overflow-y-auto relative z-10 shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh]"
             >
-              <div className="md:w-5/12 bg-gray-50 p-6 md:p-10 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 flex-shrink-0">
-                <div className="w-full aspect-square bg-white rounded-[2rem] md:rounded-[2.5rem] border-4 border-dashed border-gray-100 flex flex-col items-center justify-center overflow-hidden relative group shadow-inner">
+              <div className="md:w-5/12 bg-gray-50 p-5 md:p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 flex-shrink-0">
+                <div className="w-full aspect-square max-h-48 md:max-h-none bg-white rounded-xl md:rounded-2xl border-2 border-dashed border-gray-100 flex flex-col items-center justify-center overflow-hidden relative group shadow-inner">
                   {itemImage ? (
                     <>
                       <img src={itemImage} alt="Preview" className="w-full h-full object-cover" />
@@ -286,64 +289,64 @@ export default function MenuPage() {
                     </div>
                   )}
                 </div>
-                <div className="w-full mt-10 space-y-2">
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Image URL</label>
+                <div className="w-full mt-4 space-y-1">
+                  <label className="block text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] ml-0.5">Image URL</label>
                   <input
                     type="text"
                     value={itemImage}
                     onChange={(e) => setItemImage(e.target.value)}
-                    className="w-full px-5 py-3 text-xs bg-white border border-zinc-100 rounded-2xl focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-zinc-600 italic"
+                    className="w-full px-3 py-2 text-xs bg-white border border-zinc-100 rounded-xl focus:ring-2 focus:ring-primary/10 outline-none transition-all font-medium text-zinc-600 italic"
                     placeholder="https://images.unsplash.com/photo-..."
                   />
                 </div>
               </div>
 
-              <div className="md:w-7/12 p-6 md:p-12 flex flex-col flex-shrink-0">
-                <div className="flex justify-between items-start mb-8 md:mb-10">
+              <div className="md:w-7/12 p-5 md:p-8 flex flex-col flex-shrink-0">
+                <div className="flex justify-between items-start mb-5">
                   <div>
-                    <h3 className="text-3xl md:text-4xl font-serif font-semibold text-zinc-900 tracking-tight leading-none mb-1 md:mb-2">
+                    <h3 className="text-xl md:text-2xl font-serif font-semibold text-zinc-900 tracking-tight leading-none mb-1">
                       {editingItem ? "Edit" : "New"} Dish
                     </h3>
-                    <p className="text-gray-500 font-medium text-sm md:text-base">Define your culinary creation</p>
+                    <p className="text-gray-500 font-medium text-xs">Define your culinary creation</p>
                   </div>
-                  <button onClick={() => setShowModal(false)} className="p-2 md:p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
-                    <X size={24} className="md:w-7 md:h-7" />
+                  <button onClick={() => setShowModal(false)} className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                    <X size={20} />
                   </button>
                 </div>
 
-                <form onSubmit={handleSave} className="space-y-6 md:space-y-8 flex-1">
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Dish Name</label>
+                <form onSubmit={handleSave} className="space-y-4 flex-1">
+                  <div className="space-y-1">
+                    <label className="block text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] ml-0.5">Dish Name</label>
                     <input
                       type="text"
                       required
                       value={itemName}
                       onChange={(e) => setItemName(e.target.value)}
-                      className="w-full px-5 py-3 md:px-6 md:py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:bg-white outline-none transition-all text-base md:text-lg font-bold text-zinc-900"
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-amber-500/10 focus:bg-white outline-none transition-all text-sm font-semibold text-zinc-900"
                       placeholder="e.g. Hot Coffee, Tea"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 md:gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Price (₹)</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="block text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] ml-0.5">Price (₹)</label>
                       <input
                         type="number"
                         required
                         step="0.01"
                         value={itemPrice}
                         onChange={(e) => setItemPrice(e.target.value)}
-                        className="w-full px-5 py-3 md:px-6 md:py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:bg-white outline-none transition-all text-base md:text-lg font-bold text-zinc-900"
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-amber-500/10 focus:bg-white outline-none transition-all text-sm font-semibold text-zinc-900"
                         placeholder="0.00"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Category</label>
+                    <div className="space-y-1">
+                      <label className="block text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] ml-0.5">Category</label>
                       <select
                         required
                         value={itemCategory}
                         onChange={(e) => setItemCategory(e.target.value)}
-                        className="w-full px-5 py-3 md:px-6 md:py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:bg-white outline-none transition-all text-base md:text-lg font-bold text-zinc-900"
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-amber-500/10 focus:bg-white outline-none transition-all text-sm font-semibold text-zinc-900"
                       >
                         <option value="">Choose...</option>
                         {categories.map(cat => (
@@ -353,30 +356,35 @@ export default function MenuPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Description</label>
+                  <div className="space-y-1">
+                    <label className="block text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] ml-0.5">Veg / Non-Veg</label>
+                    <DietTypeSelect value={itemDietType} onChange={setItemDietType} />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] ml-0.5">Description</label>
                     <textarea
-                      rows={4}
+                      rows={3}
                       value={itemDescription}
                       onChange={(e) => setItemDescription(e.target.value)}
-                      className="w-full px-5 py-3 md:px-6 md:py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:bg-white outline-none transition-all text-sm md:text-base font-medium text-zinc-700 resize-none h-24 md:h-32"
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-amber-500/10 focus:bg-white outline-none transition-all text-xs font-medium text-zinc-700 resize-none h-20"
                       placeholder="Describe the flavors, ingredients, and soul of this dish..."
                     />
                   </div>
 
-                  <div className="flex gap-4 pt-6 md:pt-10 mt-auto pb-4 md:pb-0">
+                  <div className="flex gap-3 pt-4 mt-auto pb-2">
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="flex-1 px-4 py-4 md:px-8 md:py-5 border border-gray-100 rounded-2xl font-bold bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-zinc-600 transition-all text-base md:text-lg"
+                      className="flex-1 px-3 py-2.5 border border-gray-100 rounded-xl font-bold bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-zinc-600 transition-all text-sm"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-4 md:px-8 md:py-5 bg-primary text-white rounded-2xl font-bold hover:bg-zinc-900 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 md:gap-3 text-base md:text-lg"
+                      className="flex-1 px-3 py-2.5 bg-primary text-white rounded-xl font-bold hover:bg-zinc-900 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 text-sm"
                     >
-                      <Save size={20} className="md:w-6 md:h-6" />
+                      <Save size={16} />
                       {editingItem ? "Update" : "Launch"}
                     </button>
                   </div>
